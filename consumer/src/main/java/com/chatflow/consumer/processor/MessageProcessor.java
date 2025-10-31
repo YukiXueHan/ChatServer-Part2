@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class MessageProcessor {
 
   private static final Logger logger = LoggerFactory.getLogger(MessageProcessor.class);
-  private static final int MAX_MESSAGES_PER_POLL = 10;
+  private static final int MAX_MESSAGES_PER_POLL = 5;
   private static final int WAIT_TIME_SECONDS = 20; // Long polling
 
   @Value("${consumer.thread.count:20}")
