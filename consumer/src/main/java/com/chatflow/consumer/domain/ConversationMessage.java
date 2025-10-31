@@ -1,10 +1,10 @@
-package com.chatflow.consumer.entities;
+package com.chatflow.consumer.domain;
 
 /**
- * Entity for incoming and outgoing chat messages.
+ * Model for incoming and outgoing chat messages.
  * Note: userId is stored as String to accept both numeric and quoted numeric JSON values.
  */
-public class ChatMessage {
+public class ConversationMessage {
   private String userId;
   private String username;
   private String message;

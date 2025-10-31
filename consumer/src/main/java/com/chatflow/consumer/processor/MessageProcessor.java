@@ -1,6 +1,6 @@
-package com.chatflow.consumer.processors;
+package com.chatflow.consumer.processor;
 
-import com.chatflow.consumer.entities.QueueMessage;
+import com.chatflow.consumer.domain.TaskMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +24,9 @@ import java.util.concurrent.atomic.AtomicLong;
  * and routes them to the broadcaster.
  */
 @Service
-public class MessageConsumer {
+public class MessageProcessor {
 
-  private static final Logger logger = LoggerFactory.getLogger(MessageConsumer.class);
+  private static final Logger logger = LoggerFactory.getLogger(MessageProcessor.class);
   private static final int MAX_MESSAGES_PER_POLL = 10;
   private static final int WAIT_TIME_SECONDS = 20; // Long polling
 
@@ -45,7 +45,7 @@ public class MessageConsumer {
   @Value("${sqs.rooms.end:20}")
   private int roomsEnd;
 
-  private final MessageBroadcaster broadcaster;
+  private final MessageDistributor distributor;
   private final ObjectMapper objectMapper = new ObjectMapper();
 
   private SqsClient sqsClient;
@@ -59,13 +59,13 @@ public class MessageConsumer {
   private long totalProcessingTimeNanos = 0;
 
   @Autowired
-  public MessageConsumer(MessageBroadcaster broadcaster) {
-    this.broadcaster = broadcaster;
+  public MessageProcessor(MessageDistributor distributor) {
+    this.distributor = distributor;
   }
 
   @PostConstruct
   public void start() {
-    logger.info("Starting Message Consumer with {} threads", consumerThreadCount);
+    logger.info("Starting Message Processor with {} threads", consumerThreadCount);
 
     // Initialize SQS client
     sqsClient = SqsClient.builder()
@@ -100,12 +100,12 @@ public class MessageConsumer {
       }
     }
 
-    logger.info("Message Consumer started successfully");
+    logger.info("Message Processor started successfully");
   }
 
   @PreDestroy
   public void stop() {
-    logger.info("Stopping Message Consumer");
+    logger.info("Stopping Message Processor");
     running.set(false);
 
     if (executorService != null) {
@@ -124,7 +124,7 @@ public class MessageConsumer {
       sqsClient.close();
     }
 
-    logger.info("Message Consumer stopped. Total messages processed: {}",
+    logger.info("Message Processor stopped. Total messages processed: {}",
         messagesProcessed.get());
   }
 
@@ -151,7 +151,7 @@ public class MessageConsumer {
 
     @Override
     public void run() {
-      logger.info("Consumer task started for queues: {}", queueUrls);
+        logger.info("Processor task started for queues: {}", queueUrls);
 
       while (running.get()) {
         for (String queueUrl : queueUrls) {
@@ -164,7 +164,7 @@ public class MessageConsumer {
         }
       }
 
-      logger.info("Consumer task stopped for queues: {}", queueUrls);
+      logger.info("Processor task stopped for queues: {}", queueUrls);
     }
 
     /**
@@ -207,12 +207,12 @@ public class MessageConsumer {
 
       try {
         // Parse message body
-        QueueMessage queueMessage = objectMapper.readValue(
-            message.body(), QueueMessage.class);
+        TaskMessage taskMessage = objectMapper.readValue(
+            message.body(), TaskMessage.class);
 
         // Broadcast to room
-        boolean broadcasted = broadcaster.broadcastToRoom(
-            queueMessage.getRoomId(), queueMessage);
+        boolean broadcasted = distributor.broadcastToRoom(
+            taskMessage.getRoomId(), taskMessage);
 
         if (broadcasted) {
           // Acknowledge message
@@ -221,12 +221,12 @@ public class MessageConsumer {
           messagesProcessed.incrementAndGet();
 
           logger.debug("Processed message {} for room {}",
-              queueMessage.getMessageId(), queueMessage.getRoomId());
+              taskMessage.getMessageId(), taskMessage.getRoomId());
         } else {
           // Broadcast failed, message will be retried
           messagesFailed.incrementAndGet();
           logger.warn("Failed to broadcast message {} to room {}",
-              queueMessage.getMessageId(), queueMessage.getRoomId());
+              taskMessage.getMessageId(), taskMessage.getRoomId());
         }
 
       } catch (Exception e) {
@@ -263,4 +263,3 @@ public class MessageConsumer {
         running.get(), consumerThreadCount, messagesProcessed.get());
   }
 }
-

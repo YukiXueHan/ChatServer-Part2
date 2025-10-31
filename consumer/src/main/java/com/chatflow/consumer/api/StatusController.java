@@ -1,4 +1,4 @@
-package com.chatflow.consumer.endpoints;
+package com.chatflow.consumer.api;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class HealthController {
+public class StatusController {
 
   @GetMapping("/health")
   public Map<String, Object> health() {
@@ -16,4 +16,3 @@ public class HealthController {
     return response;
   }
 }
-

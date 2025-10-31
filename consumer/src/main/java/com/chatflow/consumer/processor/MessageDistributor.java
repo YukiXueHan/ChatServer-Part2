@@ -1,7 +1,7 @@
-package com.chatflow.consumer.processors;
+package com.chatflow.consumer.processor;
 
-import com.chatflow.consumer.entities.BroadcastMessage;
-import com.chatflow.consumer.entities.QueueMessage;
+import com.chatflow.consumer.domain.BroadcastEvent;
+import com.chatflow.consumer.domain.TaskMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,9 +20,9 @@ import java.util.concurrent.atomic.AtomicLong;
  * Maintains room membership and handles message delivery.
  */
 @Service
-public class MessageBroadcaster {
+public class MessageDistributor {
 
-  private static final Logger logger = LoggerFactory.getLogger(MessageBroadcaster.class);
+  private static final Logger logger = LoggerFactory.getLogger(MessageDistributor.class);
 
   private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -37,7 +37,7 @@ public class MessageBroadcaster {
   private final AtomicLong broadcastFailures = new AtomicLong(0);
 
   // Constructor - no parameters needed
-  public MessageBroadcaster() {
+  public MessageDistributor() {
     // Initialization if needed
   }
 
@@ -77,7 +77,7 @@ public class MessageBroadcaster {
   /**
    * Broadcasts a message to all clients in a room
    */
-  public boolean broadcastToRoom(String roomId, QueueMessage queueMessage) {
+  public boolean broadcastToRoom(String roomId, TaskMessage taskMessage) {
     Set<WebSocketSession> sessions = roomSessions.get(roomId);
 
     if (sessions == null || sessions.isEmpty()) {
@@ -86,10 +86,10 @@ public class MessageBroadcaster {
     }
 
     // Convert to broadcast message
-    BroadcastMessage broadcastMsg = BroadcastMessage.fromQueueMessage(queueMessage);
+    BroadcastEvent broadcastEvent = BroadcastEvent.fromTaskMessage(taskMessage);
 
     try {
-      String messageJson = objectMapper.writeValueAsString(broadcastMsg);
+      String messageJson = objectMapper.writeValueAsString(broadcastEvent);
       TextMessage textMessage = new TextMessage(messageJson);
 
       int successCount = 0;
@@ -151,4 +151,3 @@ public class MessageBroadcaster {
     return sessions != null ? sessions.size() : 0;
   }
 }
-

@@ -1,13 +1,13 @@
-package com.chatflow.consumer.entities;
+package com.chatflow.consumer.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.UUID;
 
 /**
- * Entity format for SQS queue.
+ * Message format for SQS queue.
  * This is what gets published to the queue and consumed by the consumer application.
  */
-public class QueueMessage {
+public class TaskMessage {
 
   @JsonProperty("messageId")
   private String messageId;
@@ -37,30 +37,30 @@ public class QueueMessage {
   private String clientIp;
 
   // Constructors
-  public QueueMessage() {
+  public TaskMessage() {
     this.messageId = UUID.randomUUID().toString();
   }
 
   /**
-   * Creates a QueueMessage from a ChatMessage
+   * Creates a TaskMessage from a ConversationMessage
    */
-  public static QueueMessage fromChatMessage(
-      ChatMessage chatMessage,
+  public static TaskMessage fromConversationMessage(
+      ConversationMessage conversationMessage,
       String roomId,
       String serverId,
       String clientIp) {
 
-    QueueMessage qm = new QueueMessage();
-    qm.setRoomId(roomId);
-    qm.setUserId(chatMessage.getUserId());
-    qm.setUsername(chatMessage.getUsername());
-    qm.setMessage(chatMessage.getMessage());
-    qm.setTimestamp(chatMessage.getTimestamp());
-    qm.setMessageType(chatMessage.getMessageType());
-    qm.setServerId(serverId);
-    qm.setClientIp(clientIp);
+    TaskMessage message = new TaskMessage();
+    message.setRoomId(roomId);
+    message.setUserId(conversationMessage.getUserId());
+    message.setUsername(conversationMessage.getUsername());
+    message.setMessage(conversationMessage.getMessage());
+    message.setTimestamp(conversationMessage.getTimestamp());
+    message.setMessageType(conversationMessage.getMessageType());
+    message.setServerId(serverId);
+    message.setClientIp(clientIp);
 
-    return qm;
+    return message;
   }
 
   // Getters and Setters

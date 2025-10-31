@@ -1,6 +1,6 @@
-package com.chatflow.consumer.handlers;
+package com.chatflow.consumer.connection;
 
-import com.chatflow.consumer.processors.MessageBroadcaster;
+import com.chatflow.consumer.processor.MessageDistributor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,28 +14,28 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
  * Clients connect here to receive broadcasted messages.
  */
 @Component
-public class ConsumerWebSocketHandler extends TextWebSocketHandler {
+public class WebSocketManager extends TextWebSocketHandler {
 
-  private static final Logger logger = LoggerFactory.getLogger(ConsumerWebSocketHandler.class);
+  private static final Logger logger = LoggerFactory.getLogger(WebSocketManager.class);
 
-  private final MessageBroadcaster broadcaster;
+  private final MessageDistributor distributor;
 
   @Autowired
-  public ConsumerWebSocketHandler(MessageBroadcaster broadcaster) {
-    this.broadcaster = broadcaster;
+  public WebSocketManager(MessageDistributor distributor) {
+    this.distributor = distributor;
   }
 
   @Override
   public void afterConnectionEstablished(WebSocketSession session) {
     String roomId = extractRoomIdFromSession(session);
-    broadcaster.addSessionToRoom(roomId, session);
+    distributor.addSessionToRoom(roomId, session);
 
     logger.info("Consumer session {} connected to room {}", session.getId(), roomId);
   }
 
   @Override
   public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-    broadcaster.removeSession(session);
+    distributor.removeSession(session);
 
     logger.info("Consumer session {} disconnected (code: {}, reason: {})",
         session.getId(), status.getCode(), status.getReason());
@@ -56,4 +56,3 @@ public class ConsumerWebSocketHandler extends TextWebSocketHandler {
     return parts.length > 0 ? parts[parts.length - 1] : "unknown";
   }
 }
-

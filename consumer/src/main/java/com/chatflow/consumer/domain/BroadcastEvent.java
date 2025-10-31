@@ -1,4 +1,4 @@
-package com.chatflow.consumer.entities;
+package com.chatflow.consumer.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Instant;
@@ -6,7 +6,7 @@ import java.time.Instant;
 /**
  * Message format sent to WebSocket clients.
  */
-public class BroadcastMessage {
+public class BroadcastEvent {
 
   @JsonProperty("userId")
   private String userId;
@@ -30,18 +30,18 @@ public class BroadcastMessage {
   private String status;
 
   /**
-   * Creates a BroadcastMessage from a QueueMessage
+   * Creates a BroadcastEvent from a TaskMessage
    */
-  public static BroadcastMessage fromQueueMessage(QueueMessage qm) {
-    BroadcastMessage bm = new BroadcastMessage();
-    bm.setUserId(qm.getUserId());
-    bm.setUsername(qm.getUsername());
-    bm.setMessage(qm.getMessage());
-    bm.setTimestamp(qm.getTimestamp());
-    bm.setMessageType(qm.getMessageType());
-    bm.setServerTimestamp(Instant.now().toString());
-    bm.setStatus("OK");
-    return bm;
+  public static BroadcastEvent fromTaskMessage(TaskMessage message) {
+    BroadcastEvent event = new BroadcastEvent();
+    event.setUserId(message.getUserId());
+    event.setUsername(message.getUsername());
+    event.setMessage(message.getMessage());
+    event.setTimestamp(message.getTimestamp());
+    event.setMessageType(message.getMessageType());
+    event.setServerTimestamp(Instant.now().toString());
+    event.setStatus("OK");
+    return event;
   }
 
   // Getters and Setters
