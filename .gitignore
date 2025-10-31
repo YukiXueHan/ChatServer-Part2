@@ -1,0 +1,48 @@
+# OS / Editors
+.DS_Store
+.idea/
+.vscode/
+*.iml
+
+# Dependencies & build artifacts
+node_modules/
+dist/
+build/
+out/
+.target/
+.gradle/
+.cache/
+coverage/
+*.log
+logs/
+
+data/
+
+# Java / Kotlin
+*.class
+*.jar
+*.war
+*.ear
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Go
+bin/
+*.test
+
+# Rust
+target/
+
+# Env & local
+.env
+.env.*
+*.local
+*.secret
+
+# Docker / tools
+docker-data/
+tmp/
