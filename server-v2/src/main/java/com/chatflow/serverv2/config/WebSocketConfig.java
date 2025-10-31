@@ -1,6 +1,6 @@
-package com.chatflow.serverv2.settings;
+package com.chatflow.serverv2.config;
 
-import com.chatflow.serverv2.handlers.MessageHandler;
+import com.chatflow.serverv2.connection.ChatWebSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -10,15 +10,15 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 
 @Configuration
 @EnableWebSocket
-public class ConnectionConfig implements WebSocketConfigurer {
+public class WebSocketConfig implements WebSocketConfigurer {
 
 
   @Autowired
-  private MessageHandler messageHandler;
+  private ChatWebSocketHandler chatWebSocketHandler;
 
   @Override
   public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-    registry.addHandler(messageHandler, "/chat/*")
+    registry.addHandler(chatWebSocketHandler, "/chat/*")
         .setAllowedOrigins("*");
   }
 }

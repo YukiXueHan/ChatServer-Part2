@@ -1,4 +1,4 @@
-package com.chatflow.serverv2.endpoints;
+package com.chatflow.serverv2.api;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,9 +10,9 @@ public class StatusController {
 
   @GetMapping("/health")
   public Map<String, Object> health() {
-    Map<String, Object> result = new HashMap<>();
-    result.put("status", "UP");
-    result.put("timestamp", java.time.Instant.now().toString());
-    return result;
+    Map<String, Object> response = new HashMap<>();
+    response.put("status", "UP");
+    response.put("timestamp", java.time.Instant.now().toString());
+    return response;
   }
 }

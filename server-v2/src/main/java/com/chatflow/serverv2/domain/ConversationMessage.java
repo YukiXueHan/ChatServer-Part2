@@ -1,10 +1,10 @@
-package com.chatflow.serverv2.entities;
+package com.chatflow.serverv2.domain;
 
 /**
  * Model for incoming and outgoing chat messages.
  * Note: userId is stored as String to accept both numeric and quoted numeric JSON values.
  */
-public class MessagePayload {
+public class ConversationMessage {
   private String userId;
   private String username;
   private String message;
